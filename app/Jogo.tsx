@@ -27,12 +27,18 @@ const Jogo = () => {
   const handleSaveImposto = (corporativo: number, propriedade: number) => {
     // Adicione aqui a lógica para salvar as configurações do imposto
     console.log(`Salvando impostos: Corporativo - ${corporativo}, Propriedade - ${propriedade}`);
+  };
+
+  const handleCloseImpostoModal = () => {
     setImpostoModalVisible(false);
   };
 
   const handleSaveEducacao = (pesquisa: number, universidades: number) => {
     // Adicione aqui a lógica para salvar as configurações de educação
     console.log(`Salvando educação: Pesquisa - ${pesquisa}, Universidades - ${universidades}`);
+  };
+
+  const handleCloseEducacaoModal = () => {
     setEducacaoModalVisible(false);
   };
 
@@ -92,14 +98,18 @@ const Jogo = () => {
 
       <ImpostoModal
         visible={impostoModalVisible}
-        onClose={() => setImpostoModalVisible(false)}
+        onClose={handleCloseImpostoModal}
         onSave={handleSaveImposto}
+        poder={lider.poder} // Passando a variável poder
       />
+
       <EducacaoModal
         visible={educacaoModalVisible}
-        onClose={() => setEducacaoModalVisible(false)}
+        onClose={handleCloseEducacaoModal}
         onSave={handleSaveEducacao}
+        poder={lider.poder} // Passando a variável poder
       />
+
     </View>
   );
 };
