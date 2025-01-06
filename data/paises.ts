@@ -15,6 +15,14 @@ export interface Pais {
   pib: number;
   saldoEconomia: number;
   lideres: Leader[];
+  impostos: {
+    corporativo: number;
+    propriedade: number;
+  };
+  educacao: {
+    pesquisa: number;
+    universidades: number;
+  };
 }
 
 const brasilBandeira = require('../assets/img/brasil.png');
@@ -43,9 +51,15 @@ const paises: Pais[] = [
         popularidade: 90,
       },
     ],
+    impostos: {
+      corporativo: 5,
+      propriedade: 3,
+    },
+    educacao: {
+      pesquisa: 4,
+      universidades: 6,
+    },
   },
-  
-  
   // Adicione outros países conforme necessário
 ];
 

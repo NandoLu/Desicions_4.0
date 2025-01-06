@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import styles from '../../styles/Modals';
@@ -8,22 +8,28 @@ type ImpostoModalProps = {
   onClose: () => void;
   onSave: (corporativo: number, propriedade: number) => void;
   poder: number;
+  valoresIniciais: {
+    corporativo: number;
+    propriedade: number;
+  };
 };
 
-const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, poder }) => {
-  const [corporativo, setCorporativo] = useState(0);
-  const [propriedade, setPropriedade] = useState(0);
-  const [initialCorporativo, setInitialCorporativo] = useState(0);
-  const [initialPropriedade, setInitialPropriedade] = useState(0);
+const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais }) => {
+  const [corporativo, setCorporativo] = useState(valoresIniciais.corporativo);
+  const [propriedade, setPropriedade] = useState(valoresIniciais.propriedade);
+  const [initialCorporativo, setInitialCorporativo] = useState(valoresIniciais.corporativo);
+  const [initialPropriedade, setInitialPropriedade] = useState(valoresIniciais.propriedade);
   const [canSave, setCanSave] = useState(false);
   const [custoPoder, setCustoPoder] = useState(0);
 
   useEffect(() => {
     if (visible) {
-      setInitialCorporativo(corporativo);
-      setInitialPropriedade(propriedade);
+      setCorporativo(valoresIniciais.corporativo);
+      setPropriedade(valoresIniciais.propriedade);
+      setInitialCorporativo(valoresIniciais.corporativo);
+      setInitialPropriedade(valoresIniciais.propriedade);
     }
-  }, [visible]);
+  }, [visible, valoresIniciais]);
 
   useEffect(() => {
     const novoCustoPoder = Math.abs(corporativo - initialCorporativo) + Math.abs(propriedade - initialPropriedade);
@@ -34,8 +40,6 @@ const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, p
   const handleSave = () => {
     if (canSave) {
       onSave(corporativo, propriedade);
-      setInitialCorporativo(corporativo); // Atualiza os valores iniciais
-      setInitialPropriedade(propriedade); // Atualiza os valores iniciais
     }
   };
 

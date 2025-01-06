@@ -8,22 +8,28 @@ type EducacaoModalProps = {
   onClose: () => void;
   onSave: (pesquisa: number, universidades: number) => void;
   poder: number;
+  valoresIniciais: {
+    pesquisa: number;
+    universidades: number;
+  };
 };
 
-const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave, poder }) => {
-  const [pesquisa, setPesquisa] = useState(0);
-  const [universidades, setUniversidades] = useState(0);
-  const [initialPesquisa, setInitialPesquisa] = useState(0);
-  const [initialUniversidades, setInitialUniversidades] = useState(0);
+const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais }) => {
+  const [pesquisa, setPesquisa] = useState(valoresIniciais.pesquisa);
+  const [universidades, setUniversidades] = useState(valoresIniciais.universidades);
+  const [initialPesquisa, setInitialPesquisa] = useState(valoresIniciais.pesquisa);
+  const [initialUniversidades, setInitialUniversidades] = useState(valoresIniciais.universidades);
   const [canSave, setCanSave] = useState(false);
   const [custoPoder, setCustoPoder] = useState(0);
 
   useEffect(() => {
     if (visible) {
-      setInitialPesquisa(pesquisa);
-      setInitialUniversidades(universidades);
+      setPesquisa(valoresIniciais.pesquisa);
+      setUniversidades(valoresIniciais.universidades);
+      setInitialPesquisa(valoresIniciais.pesquisa);
+      setInitialUniversidades(valoresIniciais.universidades);
     }
-  }, [visible]);
+  }, [visible, valoresIniciais]);
 
   useEffect(() => {
     const novoCustoPoder = Math.abs(pesquisa - initialPesquisa) + Math.abs(universidades - initialUniversidades);
@@ -34,8 +40,6 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
   const handleSave = () => {
     if (canSave) {
       onSave(pesquisa, universidades);
-      setInitialPesquisa(pesquisa); // Atualiza os valores iniciais
-      setInitialUniversidades(universidades); // Atualiza os valores iniciais
     }
   };
 
