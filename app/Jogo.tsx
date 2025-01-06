@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, BackHandler, Image } from 'react-native';
+import { View, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ import { useTurno } from './logic/Logica';
 import Header from './BarsJogo/Header';
 import Footer from './BarsJogo/Footer';
 
+import ABotoes from './screens/ABotoes';
 import ImpostoModal from '../app/screens/ImpostoModal';
 import EducacaoModal from '../app/screens/EducacaoModal';
 
@@ -27,6 +28,7 @@ const Jogo = () => {
 
   const [impostos, setImpostos] = useState(pais.impostos);
   const [educacao, setEducacao] = useState(pais.educacao);
+  const [poderAtual, setPoderAtual] = useState(lider.poder);
 
   useEffect(() => {
     const carregarDadosSalvos = async () => {
@@ -45,11 +47,11 @@ const Jogo = () => {
     carregarDadosSalvos();
   }, [pais]);
 
-  const salvarDados = async (novosImpostos: { corporativo: number, propriedade: number }, novaEducacao: { pesquisa: number, universidades: number }) => {
+  const salvarDados = async (novosImpostos: { corporativo: number, propriedade: number }, novaEducacao: { pesquisa: number, universidades: number }, novoPoder: number) => {
     try {
       const jogoAtual = {
         pais,
-        lider,
+        lider: { ...lider, poder: novoPoder },
         impostos: novosImpostos,
         educacao: novaEducacao,
       };
@@ -59,22 +61,26 @@ const Jogo = () => {
     }
   };
 
-  const handleSaveImposto = (corporativo: number, propriedade: number) => {
+  const handleSaveImposto = (corporativo: number, propriedade: number, novoPoder: number) => {
     const novosImpostos = { corporativo, propriedade };
     setImpostos(novosImpostos);
-    salvarDados(novosImpostos, educacao);
-    console.log(`Salvando impostos: Corporativo - ${corporativo}, Propriedade - ${propriedade}`);
+    setPoderAtual(novoPoder);
+    salvarDados(novosImpostos, educacao, novoPoder);
+    avancarTurno();
+    console.log(`Salvando impostos: Corporativo - ${corporativo}, Propriedade - ${propriedade}. Novo Poder: ${novoPoder}`);
   };
 
   const handleCloseImpostoModal = () => {
     setImpostoModalVisible(false);
   };
 
-  const handleSaveEducacao = (pesquisa: number, universidades: number) => {
+  const handleSaveEducacao = (pesquisa: number, universidades: number, novoPoder: number) => {
     const novaEducacao = { pesquisa, universidades };
     setEducacao(novaEducacao);
-    salvarDados(impostos, novaEducacao);
-    console.log(`Salvando educação: Pesquisa - ${pesquisa}, Universidades - ${universidades}`);
+    setPoderAtual(novoPoder);
+    salvarDados(impostos, novaEducacao, novoPoder);
+    avancarTurno();
+    console.log(`Salvando educação: Pesquisa - ${pesquisa}, Universidades - ${universidades}. Novo Poder: ${novoPoder}`);
   };
 
   const handleCloseEducacaoModal = () => {
@@ -102,30 +108,9 @@ const Jogo = () => {
 
   return (
     <View style={styles.container}>
-      <Header pais={pais} lider={lider} />
+      <Header pais={pais} lider={{ ...lider, poder: poderAtual }} />
 
-      <View style={styles.BotoesContainer}>
-        <TouchableOpacity
-          style={styles.botoes}
-          onPress={() => setImpostoModalVisible(true)}
-        >
-          <Image source={require('../assets/img.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>Impostos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.botoes}
-          onPress={() => setEducacaoModalVisible(true)}
-        >
-          <Image source={require('../assets/img.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>Educação</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.botoes}>
-          <Image source={require('../assets/img.png')} style={styles.buttonImage} />
-          <Text style={styles.buttonText}>Economia</Text>
-        </TouchableOpacity>
-      </View>
+      <ABotoes setImpostoModalVisible={setImpostoModalVisible} setEducacaoModalVisible={setEducacaoModalVisible} />
 
       <TouchableOpacity onPress={avancarTurno} style={styles.button}>
         <Text style={styles.buttonText}>Avançar</Text>
@@ -137,16 +122,18 @@ const Jogo = () => {
         visible={impostoModalVisible}
         onClose={handleCloseImpostoModal}
         onSave={handleSaveImposto}
-        poder={lider.poder} // Passando a variável poder
-        valoresIniciais={impostos} // Passando os valores iniciais de impostos
+        poder={poderAtual}
+        valoresIniciais={impostos}
+        onAvancarTurno={avancarTurno}
       />
 
       <EducacaoModal
         visible={educacaoModalVisible}
         onClose={handleCloseEducacaoModal}
         onSave={handleSaveEducacao}
-        poder={lider.poder} // Passando a variável poder
-        valoresIniciais={educacao} // Passando os valores iniciais de educação
+        poder={poderAtual}
+        valoresIniciais={educacao}
+        onAvancarTurno={avancarTurno}
       />
     </View>
   );

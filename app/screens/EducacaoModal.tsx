@@ -6,15 +6,16 @@ import styles from '../../styles/Modals';
 type EducacaoModalProps = {
   visible: boolean;
   onClose: () => void;
-  onSave: (pesquisa: number, universidades: number) => void;
+  onSave: (pesquisa: number, universidades: number, novoPoder: number) => void;
   poder: number;
   valoresIniciais: {
     pesquisa: number;
     universidades: number;
   };
+  onAvancarTurno: () => void;
 };
 
-const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais }) => {
+const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais, onAvancarTurno }) => {
   const [pesquisa, setPesquisa] = useState(valoresIniciais.pesquisa);
   const [universidades, setUniversidades] = useState(valoresIniciais.universidades);
   const [initialPesquisa, setInitialPesquisa] = useState(valoresIniciais.pesquisa);
@@ -39,7 +40,8 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
 
   const handleSave = () => {
     if (canSave) {
-      onSave(pesquisa, universidades);
+      onSave(pesquisa, universidades, poder - custoPoder);
+      onAvancarTurno();
     }
   };
 
@@ -69,7 +71,7 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
             onValueChange={setUniversidades}
           />
 
-          <Text style={styles.modalText}>Poder: {poder}</Text>
+          <Text style={styles.modalText}>Poder: {poder - custoPoder}</Text>
           <Text style={styles.modalText}>Custo Poder: {custoPoder}</Text>
 
           <View style={styles.buttonContainer}>

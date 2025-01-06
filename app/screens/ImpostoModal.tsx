@@ -6,21 +6,23 @@ import styles from '../../styles/Modals';
 type ImpostoModalProps = {
   visible: boolean;
   onClose: () => void;
-  onSave: (corporativo: number, propriedade: number) => void;
+  onSave: (corporativo: number, propriedade: number, novoPoder: number) => void;
   poder: number;
   valoresIniciais: {
     corporativo: number;
     propriedade: number;
   };
+  onAvancarTurno: () => void;
 };
 
-const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais }) => {
+const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, poder, valoresIniciais, onAvancarTurno }) => {
   const [corporativo, setCorporativo] = useState(valoresIniciais.corporativo);
   const [propriedade, setPropriedade] = useState(valoresIniciais.propriedade);
   const [initialCorporativo, setInitialCorporativo] = useState(valoresIniciais.corporativo);
   const [initialPropriedade, setInitialPropriedade] = useState(valoresIniciais.propriedade);
   const [canSave, setCanSave] = useState(false);
   const [custoPoder, setCustoPoder] = useState(0);
+  const [receitaImpacto, setReceitaImpacto] = useState({ receita: 0, impacto: 0 });
 
   useEffect(() => {
     if (visible) {
@@ -35,11 +37,22 @@ const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, p
     const novoCustoPoder = Math.abs(corporativo - initialCorporativo) + Math.abs(propriedade - initialPropriedade);
     setCustoPoder(novoCustoPoder);
     setCanSave(novoCustoPoder <= poder && (corporativo !== initialCorporativo || propriedade !== initialPropriedade));
+    calcularReceitaImpacto();
   }, [corporativo, propriedade, poder, initialCorporativo, initialPropriedade]);
+
+  const calcularReceitaImpacto = () => {
+    const receita = corporativo * 2 + propriedade * 5;
+    const impacto = 
+      (corporativo === 0 ? 2 : corporativo * -0.5) + 
+      (propriedade === 0 ? 5 : propriedade * -2);
+
+    setReceitaImpacto({ receita, impacto });
+  };
 
   const handleSave = () => {
     if (canSave) {
-      onSave(corporativo, propriedade);
+      onSave(corporativo, propriedade, poder - custoPoder);
+      onAvancarTurno();
     }
   };
 
@@ -69,8 +82,10 @@ const ImpostoModal: React.FC<ImpostoModalProps> = ({ visible, onClose, onSave, p
             onValueChange={setPropriedade}
           />
 
-          <Text style={styles.modalText}>Poder: {poder}</Text>
+          <Text style={styles.modalText}>Poder: {poder - custoPoder}</Text>
           <Text style={styles.modalText}>Custo Poder: {custoPoder}</Text>
+          <Text style={styles.modalText}>Receita: {receitaImpacto.receita}</Text>
+          <Text style={styles.modalText}>Impacto: {receitaImpacto.impacto}</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={onClose} style={styles.modalButton}>
