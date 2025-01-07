@@ -32,7 +32,7 @@ const Jogo = () => {
   const { ano, mes, receitaTotal, despesaTotal, impactoTotal, avancarTurno, atualizarTotais } = useTurno(
     pais.ano,
     impostos.corporativo * 2 + impostos.propriedade * 5,
-    educacao.pesquisa * -2 + educacao.universidades * -5,
+    -(educacao.pesquisa * 2 + educacao.universidades * 5),
     (impostos.corporativo === 0 ? 2 : impostos.corporativo * -0.5) + (impostos.propriedade === 0 ? 5 : impostos.propriedade * -2)
   );
 
@@ -45,7 +45,9 @@ const Jogo = () => {
           if (impostosSalvos && educacaoSalva) {
             setImpostos(impostosSalvos);
             setEducacao(educacaoSalva);
+  
             // Atualiza os valores iniciais com os dados salvos
+            const despesaTotal = -1 * (educacaoSalva.pesquisa * 2 + educacaoSalva.universidades * 5);
             atualizarTotais(
               impostosSalvos.corporativo * 2 + impostosSalvos.propriedade * 5,
               0,
@@ -54,10 +56,13 @@ const Jogo = () => {
             );
             atualizarTotais(
               0,
-              educacaoSalva.pesquisa * 2 + educacaoSalva.universidades * 5,
+              despesaTotal, // Garante que a despesa seja negativa
               (educacaoSalva.pesquisa === 0 ? -2 : educacaoSalva.pesquisa * 0.5) + (educacaoSalva.universidades === 0 ? -5 : educacaoSalva.universidades * 2),
               'educacao'
             );
+  
+            // Atualiza saldoEconomia com a despesa negativa
+            setSaldoEconomia(prevSaldo => prevSaldo - (educacaoSalva.pesquisa * 2 + educacaoSalva.universidades * 5));
           }
         }
       } catch (error) {
@@ -66,6 +71,19 @@ const Jogo = () => {
     };
     carregarDadosSalvos();
   }, [pais]);
+  
+  
+  
+  
+
+  useEffect(() => {
+    // Corrigir inicialização duplicada e garantir que despesa seja negativa
+    setSaldoEconomia(pais.saldoEconomia);
+    setPopularidade(lider.popularidade);
+    setSaldoEconomia(prevSaldo => prevSaldo - (educacao.pesquisa * 2 + educacao.universidades * 5));
+  }, [pais, lider, educacao]);
+  
+  
 
   const salvarDados = async (novosImpostos: { corporativo: number, propriedade: number }, novaEducacao: { pesquisa: number, universidades: number }, novoPoder: number) => {
     try {
@@ -93,7 +111,7 @@ const Jogo = () => {
     setEducacao(novaEducacao);
     setPoderAtual(novoPoder);
     salvarDados(impostos, novaEducacao, novoPoder);
-    atualizarTotais(0, despesa, impacto, 'educacao'); // Atualiza a despesa e impacto da educação
+    atualizarTotais(0, -despesa, impacto, 'educacao'); // Atualiza a despesa e impacto da educação
   };
 
   const handleCloseEducacaoModal = () => {
@@ -110,10 +128,10 @@ const Jogo = () => {
   }, [navigation]);
 
   useEffect(() => {
-    setSaldoEconomia(prevSaldo => prevSaldo + receitaTotal - despesaTotal);
+    setSaldoEconomia(prevSaldo => prevSaldo + receitaTotal - Math.abs(despesaTotal));
     setPopularidade(prevPopularidade => prevPopularidade + impactoTotal);
-  }, [mes, ano]);
-
+  }, [mes, ano, receitaTotal, despesaTotal, impactoTotal]);
+  
   const handleAvancarTurno = () => {
     avancarTurno();
   };

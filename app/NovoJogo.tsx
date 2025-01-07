@@ -17,12 +17,31 @@ const NovoJogo = () => {
 
   const handleComecar = async () => {
     if (paisSelecionado && liderSelecionado) {
-      const jogo = { pais: paisSelecionado, lider: liderSelecionado };
+      // Redefine saldoEconomia e outros valores conforme necessário
+      const novoJogo = {
+        pais: {
+          ...paisSelecionado,
+          saldoEconomia: paisSelecionado.saldoEconomia, // Redefine saldoEconomia com o valor inicial do novo país
+          ano: paisSelecionado.ano, // Redefine o ano inicial do novo país
+          impostos: {
+            corporativo: paisSelecionado.impostos.corporativo,
+            propriedade: paisSelecionado.impostos.propriedade,
+          },
+          educacao: {
+            pesquisa: paisSelecionado.educacao.pesquisa,
+            universidades: paisSelecionado.educacao.universidades,
+          }
+        },
+        lider: liderSelecionado
+      };
+  
       await AsyncStorage.removeItem('jogoAtual'); // Remove o jogo anterior
-      await AsyncStorage.setItem('jogoAtual', JSON.stringify(jogo)); // Salva o novo jogo
-      navigation.navigate('Jogo', { pais: paisSelecionado, lider: liderSelecionado });
+      await AsyncStorage.setItem('jogoAtual', JSON.stringify(novoJogo)); // Salva o novo jogo
+  
+      navigation.navigate('Jogo', { pais: novoJogo.pais, lider: novoJogo.lider });
     }
   };
+  
 
   return (
     <View style={styles.container}>

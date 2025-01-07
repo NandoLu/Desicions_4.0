@@ -35,8 +35,8 @@ const paises: Pais[] = [
     bandeira: brasilBandeira,
     ano: 1822,
     populacao: 213,
-    pib: 334,
-    saldoEconomia: 400,
+    pib: 30,
+    saldoEconomia: 4030,
     lideres: [
       {
         nome: 'Getulio Vargas',

@@ -37,25 +37,44 @@ const Menu = () => {
     }
   };
 
+  const excluirJogo = async () => {
+    await AsyncStorage.removeItem('jogoAtual');
+    setJogoExistente(false);
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <TouchableOpacity
-        style={[styles.button, !jogoExistente && styles.disabledButton]}
-        disabled={!jogoExistente}
-        onPress={continuarJogo}
-      >
-        <Text style={styles.buttonText}>Continuar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NovoJogo')}>
-        <Text style={styles.buttonText}>Novo Jogo</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Configurações</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Apoiar</Text>
-      </TouchableOpacity>
+
+      <View style={styles.containerMenu}>
+        <TouchableOpacity
+          style={[styles.button, !jogoExistente && styles.disabledButton]}
+          disabled={!jogoExistente}
+          onPress={continuarJogo}
+        >
+          <Text style={styles.buttonText}>Continuar</Text>
+        </TouchableOpacity>
+        {jogoExistente && (
+        <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={excluirJogo}>
+          <Text style={styles.buttondeleteText}>Excluir</Text>
+        </TouchableOpacity>
+      )}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NovoJogo')}>
+          <Text style={styles.buttonText}>Novo Jogo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Configurações</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Apoiar</Text>
+        </TouchableOpacity>
+
+        
+      </View>
+
+
+      
     </View>
   );
 }
