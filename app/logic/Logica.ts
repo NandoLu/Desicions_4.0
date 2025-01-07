@@ -1,19 +1,17 @@
 // Logica.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const nomesMeses = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ];
 
-export const useTurno = (anoInicial: number) => {
+export const useTurno = (anoInicial: number, receitaInicial: number, despesaInicial: number, impactoInicial: number) => {
   const [ano, setAno] = useState(anoInicial);
   const [mes, setMes] = useState(0);
-  const [receitaImposto, setReceitaImposto] = useState(0);
-  const [receitaEducacao, setReceitaEducacao] = useState(0);
-  const [despesaImposto, setDespesaImposto] = useState(0);
-  const [despesaEducacao, setDespesaEducacao] = useState(0);
-  const [impactoImposto, setImpactoImposto] = useState(0);
+  const [receitaImposto, setReceitaImposto] = useState(receitaInicial);
+  const [despesaEducacao, setDespesaEducacao] = useState(despesaInicial);
+  const [impactoImposto, setImpactoImposto] = useState(impactoInicial);
   const [impactoEducacao, setImpactoEducacao] = useState(0);
 
   const atualizarTotais = (receita: number, despesa: number, impacto: number, tipo: string) => {
@@ -27,6 +25,12 @@ export const useTurno = (anoInicial: number) => {
       console.log(`Despesa Educação: ${despesa}, Impacto Educação: ${impacto}`);
     }
   };
+
+  useEffect(() => {
+    console.log(`Receita Total: ${receitaImposto}`);
+    console.log(`Despesa Total: ${despesaEducacao}`);
+    console.log(`Impacto Total: ${impactoImposto + impactoEducacao}`);
+  }, [mes, ano]);
 
   const receitaTotal = receitaImposto;
   const despesaTotal = despesaEducacao;

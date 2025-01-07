@@ -20,12 +20,21 @@ const Jogo = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<JogoRouteProp>();
   const { pais, lider } = route.params as { pais: Pais, lider: Leader };
-  const { ano, mes, receitaTotal, despesaTotal, impactoTotal, avancarTurno, atualizarTotais } = useTurno(pais.ano);
+
   const [impostoModalVisible, setImpostoModalVisible] = useState(false);
   const [educacaoModalVisible, setEducacaoModalVisible] = useState(false);
   const [impostos, setImpostos] = useState(pais.impostos);
   const [educacao, setEducacao] = useState(pais.educacao);
   const [poderAtual, setPoderAtual] = useState(lider.poder);
+  const [saldoEconomia, setSaldoEconomia] = useState(pais.saldoEconomia);
+  const [popularidade, setPopularidade] = useState(lider.popularidade);
+
+  const { ano, mes, receitaTotal, despesaTotal, impactoTotal, avancarTurno, atualizarTotais } = useTurno(
+    pais.ano,
+    impostos.corporativo * 2 + impostos.propriedade * 5,
+    educacao.pesquisa * -2 + educacao.universidades * -5,
+    (impostos.corporativo === 0 ? 2 : impostos.corporativo * -0.5) + (impostos.propriedade === 0 ? 5 : impostos.propriedade * -2)
+  );
 
   useEffect(() => {
     const carregarDadosSalvos = async () => {
@@ -33,8 +42,23 @@ const Jogo = () => {
         const dadosSalvos = await AsyncStorage.getItem('jogoAtual');
         if (dadosSalvos) {
           const { impostos: impostosSalvos, educacao: educacaoSalva } = JSON.parse(dadosSalvos);
-          setImpostos(impostosSalvos || pais.impostos);
-          setEducacao(educacaoSalva || pais.educacao);
+          if (impostosSalvos && educacaoSalva) {
+            setImpostos(impostosSalvos);
+            setEducacao(educacaoSalva);
+            // Atualiza os valores iniciais com os dados salvos
+            atualizarTotais(
+              impostosSalvos.corporativo * 2 + impostosSalvos.propriedade * 5,
+              0,
+              (impostosSalvos.corporativo === 0 ? 2 : impostosSalvos.corporativo * -0.5) + (impostosSalvos.propriedade === 0 ? 5 : impostosSalvos.propriedade * -2),
+              'imposto'
+            );
+            atualizarTotais(
+              0,
+              educacaoSalva.pesquisa * 2 + educacaoSalva.universidades * 5,
+              (educacaoSalva.pesquisa === 0 ? -2 : educacaoSalva.pesquisa * 0.5) + (educacaoSalva.universidades === 0 ? -5 : educacaoSalva.universidades * 2),
+              'educacao'
+            );
+          }
         }
       } catch (error) {
         console.error('Erro ao carregar dados salvos: ', error);
@@ -58,8 +82,6 @@ const Jogo = () => {
     setPoderAtual(novoPoder);
     salvarDados(novosImpostos, educacao, novoPoder);
     atualizarTotais(receita, 0, impacto, 'imposto'); // Atualiza a receita e impacto dos impostos
-    avancarTurno();
-    console.log(`Salvando impostos: Corporativo - ${corporativo}, Propriedade - ${propriedade}. Novo Poder: ${novoPoder}`);
   };
 
   const handleCloseImpostoModal = () => {
@@ -72,8 +94,6 @@ const Jogo = () => {
     setPoderAtual(novoPoder);
     salvarDados(impostos, novaEducacao, novoPoder);
     atualizarTotais(0, despesa, impacto, 'educacao'); // Atualiza a despesa e impacto da educação
-    avancarTurno();
-    console.log(`Salvando educação: Pesquisa - ${pesquisa}, Universidades - ${universidades}. Novo Poder: ${novoPoder}`);
   };
 
   const handleCloseEducacaoModal = () => {
@@ -89,6 +109,15 @@ const Jogo = () => {
     return () => backHandler.remove();
   }, [navigation]);
 
+  useEffect(() => {
+    setSaldoEconomia(prevSaldo => prevSaldo + receitaTotal - despesaTotal);
+    setPopularidade(prevPopularidade => prevPopularidade + impactoTotal);
+  }, [mes, ano]);
+
+  const handleAvancarTurno = () => {
+    avancarTurno();
+  };
+
   if (!pais || !lider || !impostos || !educacao) {
     return (
       <View style={styles.container}>
@@ -97,15 +126,11 @@ const Jogo = () => {
     );
   }
 
-  // Calculando os valores de saldoEconomia e popularidade
-  const saldoEconomia = pais.saldoEconomia + receitaTotal + despesaTotal;
-  const popularidade = lider.popularidade + impactoTotal;
-
   return (
     <View style={styles.container}>
       <Header pais={pais} lider={{ ...lider, poder: poderAtual }} />
       <ABotoes setImpostoModalVisible={setImpostoModalVisible} setEducacaoModalVisible={setEducacaoModalVisible} />
-      <TouchableOpacity onPress={avancarTurno} style={styles.button}>
+      <TouchableOpacity onPress={handleAvancarTurno} style={styles.button}>
         <Text style={styles.buttonText}>Avançar</Text>
       </TouchableOpacity>
       <Footer pais={pais} lider={lider} ano={ano} mes={mes} saldoEconomia={saldoEconomia} popularidade={popularidade} />
