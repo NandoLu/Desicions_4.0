@@ -22,6 +22,7 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
   const [initialUniversidades, setInitialUniversidades] = useState(valoresIniciais.universidades);
   const [canSave, setCanSave] = useState(false);
   const [custoPoder, setCustoPoder] = useState(0);
+  const [despesaImpacto, setDespesaImpacto] = useState({ despesa: 0, impacto: 0 });
 
   useEffect(() => {
     if (visible) {
@@ -36,7 +37,17 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
     const novoCustoPoder = Math.abs(pesquisa - initialPesquisa) + Math.abs(universidades - initialUniversidades);
     setCustoPoder(novoCustoPoder);
     setCanSave(novoCustoPoder <= poder && (pesquisa !== initialPesquisa || universidades !== initialUniversidades));
+    calcularDespesaImpacto();
   }, [pesquisa, universidades, poder, initialPesquisa, initialUniversidades]);
+
+  const calcularDespesaImpacto = () => {
+    const despesa = -(pesquisa * 2 + universidades * 5);
+    const impacto = 
+      (pesquisa === 0 ? -2 : pesquisa * 0.5) + 
+      (universidades === 0 ? -5 : universidades * 2);
+
+    setDespesaImpacto({ despesa, impacto });
+  };
 
   const handleSave = () => {
     if (canSave) {
@@ -73,6 +84,8 @@ const EducacaoModal: React.FC<EducacaoModalProps> = ({ visible, onClose, onSave,
 
           <Text style={styles.modalText}>Poder: {poder - custoPoder}</Text>
           <Text style={styles.modalText}>Custo Poder: {custoPoder}</Text>
+          <Text style={styles.modalText}>Despesa: {despesaImpacto.despesa}</Text>
+          <Text style={styles.modalText}>Impacto: {despesaImpacto.impacto}</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={onClose} style={styles.modalButton}>
