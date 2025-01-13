@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#1c1c1b',
   },
   Header: {
     paddingLeft: 10,
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     height: 80,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#7c7978',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#e8e8e8',

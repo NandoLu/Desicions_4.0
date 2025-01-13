@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5fcff',
+    backgroundColor: '#1c1c1b',
   },
   logo: {
     width: 200,
@@ -13,7 +13,7 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#514d4b',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
@@ -34,10 +34,10 @@ export default StyleSheet.create({
     backgroundColor: 'red',
     position: 'absolute',
     width: '30%',
-    left: '100%',
+    left: '102%',
   },
   containerMenu:{
-    backgroundColor: 'blue',
+    // backgroundColor: 'blue',
     width: '50%',
   }
 });
